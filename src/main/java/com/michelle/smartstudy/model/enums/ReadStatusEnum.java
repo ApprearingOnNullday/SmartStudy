@@ -1,6 +1,6 @@
 package com.michelle.smartstudy.model.enums;
 
-public enum HomeworkReadEnum {
+public enum ReadStatusEnum {
 
     READ(1, "已读"),
 
@@ -10,7 +10,7 @@ public enum HomeworkReadEnum {
 
     private String desc;
 
-    HomeworkReadEnum(int code, String desc) {
+    ReadStatusEnum(int code, String desc) {
         this.code = code;
         this.desc = desc;
     }
@@ -32,8 +32,8 @@ public enum HomeworkReadEnum {
     }
 
     public static String getDescByCode(Integer code) {
-        HomeworkReadEnum[] values = HomeworkReadEnum.values();
-        for (HomeworkReadEnum status : values) {
+        ReadStatusEnum[] values = ReadStatusEnum.values();
+        for (ReadStatusEnum status : values) {
             if (status.code.equals(code)) {
                 return status.getDesc();
             }

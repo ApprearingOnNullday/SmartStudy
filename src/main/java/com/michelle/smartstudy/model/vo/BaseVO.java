@@ -1,6 +1,6 @@
-package com.mizore.easybuy.model.vo;
+package com.michelle.smartstudy.model.vo;
 
-import com.mizore.easybuy.model.enums.ReturnEnum;
+import com.michelle.smartstudy.model.enums.ReturnEnum;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 

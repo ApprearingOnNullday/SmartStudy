@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 作业表
+ * 作业提交表
  * </p>
  *
  * @author AppearingOnNullday
@@ -22,38 +22,38 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TbHomework implements Serializable {
+public class TbSubmission implements Serializable {
 
     /**
-     * 自增主键ID（作业id）
+     * 自增主键ID（提交id）
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     /**
-     * 作业标题
+     * 学生id
      */
-    private String title;
+    private Integer studentId;
 
     /**
-     * 课程id
+     * 作业id
      */
-    private Integer courseId;
+    private Integer homeworkId;
 
     /**
-     * 作业详情
+     * 提交时间
      */
-    private String description;
+    private LocalDateTime submitTime;
 
     /**
-     * 开始时间
+     * 提交内容
      */
-    private LocalDateTime start;
+    private String content;
 
     /**
-     * 截止时间
+     * 批改状态
      */
-    private LocalDateTime end;
+    private Integer status;
 
     /**
      * 软删标识，0：未删除，1：已删除
@@ -85,13 +85,13 @@ public class TbHomework implements Serializable {
         if (getClass() != that.getClass()) {
             return false;
         }
-        TbHomework other = (TbHomework) that;
+        TbSubmission other = (TbSubmission) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-                && (this.getTitle() == null ? other.getTitle() == null : this.getTitle().equals(other.getTitle()))
-                && (this.getCourseId() == null ? other.getCourseId() == null : this.getCourseId().equals(other.getCourseId()))
-                && (this.getDescription() == null ? other.getDescription() == null : this.getDescription().equals(other.getDescription()))
-                && (this.getStart() == null ? other.getStart() == null : this.getStart().equals(other.getStart()))
-                && (this.getEnd() == null ? other.getEnd() == null : this.getEnd().equals(other.getEnd()))
+                && (this.getStudentId() == null ? other.getStudentId() == null : this.getStudentId().equals(other.getStudentId()))
+                && (this.getHomeworkId() == null ? other.getHomeworkId() == null : this.getHomeworkId().equals(other.getHomeworkId()))
+                && (this.getSubmitTime() == null ? other.getSubmitTime() == null : this.getSubmitTime().equals(other.getSubmitTime()))
+                && (this.getContent() == null ? other.getContent() == null : this.getContent().equals(other.getContent()))
+                && (this.getStatus() == null ? other.getStatus() == null : this.getStatus().equals(other.getStatus()))
                 && (this.getDeleted() == null ? other.getDeleted() == null : this.getDeleted().equals(other.getDeleted()))
                 && (this.getCtime() == null ? other.getCtime() == null : this.getCtime().equals(other.getCtime()))
                 && (this.getMtime() == null ? other.getMtime() == null : this.getMtime().equals(other.getMtime()));
@@ -102,11 +102,11 @@ public class TbHomework implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
-        result = prime * result + ((getTitle() == null) ? 0 : getTitle().hashCode());
-        result = prime * result + ((getCourseId() == null) ? 0 : getCourseId().hashCode());
-        result = prime * result + ((getDescription() == null) ? 0 : getDescription().hashCode());
-        result = prime * result + ((getStart() == null) ? 0 : getStart().hashCode());
-        result = prime * result + ((getEnd() == null) ? 0 : getEnd().hashCode());
+        result = prime * result + ((getStudentId() == null) ? 0 : getStudentId().hashCode());
+        result = prime * result + ((getHomeworkId() == null) ? 0 : getHomeworkId().hashCode());
+        result = prime * result + ((getSubmitTime() == null) ? 0 : getSubmitTime().hashCode());
+        result = prime * result + ((getContent() == null) ? 0 : getContent().hashCode());
+        result = prime * result + ((getStatus() == null) ? 0 : getStatus().hashCode());
         result = prime * result + ((getDeleted() == null) ? 0 : getDeleted().hashCode());
         result = prime * result + ((getCtime() == null) ? 0 : getCtime().hashCode());
         result = prime * result + ((getMtime() == null) ? 0 : getMtime().hashCode());
@@ -120,11 +120,11 @@ public class TbHomework implements Serializable {
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
-        sb.append(", title=").append(title);
-        sb.append(", courseId=").append(courseId);
-        sb.append(", description=").append(description);
-        sb.append(", start=").append(start);
-        sb.append(", end=").append(end);
+        sb.append(", studentId=").append(studentId);
+        sb.append(", homeworkId=").append(homeworkId);
+        sb.append(", submitTime=").append(submitTime);
+        sb.append(", content=").append(content);
+        sb.append(", status=").append(status);
         sb.append(", deleted=").append(deleted);
         sb.append(", ctime=").append(ctime);
         sb.append(", mtime=").append(mtime);

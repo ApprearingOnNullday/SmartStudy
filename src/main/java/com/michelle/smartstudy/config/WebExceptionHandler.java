@@ -1,6 +1,6 @@
-package com.mizore.easybuy.config;
+package com.michelle.smartstudy.config;
 
-import com.mizore.easybuy.model.vo.BaseVO;
+import com.michelle.smartstudy.model.vo.BaseVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.ExceptionHandler;

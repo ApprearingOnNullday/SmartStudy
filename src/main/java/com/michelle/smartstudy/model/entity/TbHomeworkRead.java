@@ -11,39 +11,39 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 用户表
+ * 作业已读表
  * </p>
  *
  * @author AppearingOnNullday
  * @since 2024-05-20
  */
-@TableName("tb_user")
+@TableName("tb_homework_read")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TbUser implements Serializable {
+public class TbHomeworkRead implements Serializable {
 
     /**
-     * 自增主键ID（用户id）
+     * 自增主键ID
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     /**
-     * 用户名
+     * 学生id
      */
-    private String username;
+    private Integer studentId;
 
     /**
-     * 密码
+     * 作业id
      */
-    private String password;
+    private Integer homeworkId;
 
     /**
-     * 角色
+     * 已读状态
      */
-    private Integer role;
+    private Integer status;
 
     /**
      * 软删标识，0：未删除，1：已删除
@@ -75,11 +75,11 @@ public class TbUser implements Serializable {
         if (getClass() != that.getClass()) {
             return false;
         }
-        TbUser other = (TbUser) that;
+        TbHomeworkRead other = (TbHomeworkRead) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-                && (this.getUsername() == null ? other.getUsername() == null : this.getUsername().equals(other.getUsername()))
-                && (this.getPassword() == null ? other.getPassword() == null : this.getPassword().equals(other.getPassword()))
-                && (this.getPassword() == null ? other.getRole() == null : this.getRole().equals(other.getRole()))
+                && (this.getStudentId() == null ? other.getStudentId() == null : this.getStudentId().equals(other.getStudentId()))
+                && (this.getHomeworkId() == null ? other.getHomeworkId() == null : this.getHomeworkId().equals(other.getHomeworkId()))
+                && (this.getStatus() == null ? other.getStatus() == null : this.getStatus().equals(other.getStatus()))
                 && (this.getDeleted() == null ? other.getDeleted() == null : this.getDeleted().equals(other.getDeleted()))
                 && (this.getCtime() == null ? other.getCtime() == null : this.getCtime().equals(other.getCtime()))
                 && (this.getMtime() == null ? other.getMtime() == null : this.getMtime().equals(other.getMtime()));
@@ -90,9 +90,9 @@ public class TbUser implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
-        result = prime * result + ((getUsername() == null) ? 0 : getUsername().hashCode());
-        result = prime * result + ((getPassword() == null) ? 0 : getPassword().hashCode());
-        result = prime * result + ((getRole() == null) ? 0 : getRole().hashCode());
+        result = prime * result + ((getStudentId() == null) ? 0 : getStudentId().hashCode());
+        result = prime * result + ((getHomeworkId() == null) ? 0 : getHomeworkId().hashCode());
+        result = prime * result + ((getStatus() == null) ? 0 : getStatus().hashCode());
         result = prime * result + ((getDeleted() == null) ? 0 : getDeleted().hashCode());
         result = prime * result + ((getCtime() == null) ? 0 : getCtime().hashCode());
         result = prime * result + ((getMtime() == null) ? 0 : getMtime().hashCode());
@@ -106,9 +106,9 @@ public class TbUser implements Serializable {
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
-        sb.append(", username=").append(username);
-        sb.append(", password=").append(password);
-        sb.append(", role=").append(role);
+        sb.append(", studentId=").append(studentId);
+        sb.append(", homeworkId=").append(homeworkId);
+        sb.append(", status=").append(status);
         sb.append(", deleted=").append(deleted);
         sb.append(", ctime=").append(ctime);
         sb.append(", mtime=").append(mtime);

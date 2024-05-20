@@ -1,4 +1,4 @@
-package com.mizore.easybuy.model.vo;
+package com.michelle.smartstudy.model.vo;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

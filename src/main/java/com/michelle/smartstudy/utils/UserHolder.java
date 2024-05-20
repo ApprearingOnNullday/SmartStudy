@@ -1,6 +1,6 @@
-package com.mizore.easybuy.utils;
+package com.michelle.smartstudy.utils;
 
-import com.mizore.easybuy.model.dto.UserDTO;
+import com.michelle.smartstudy.model.dto.UserDTO;
 
 // 使用 threadLocal 保持用户对象上下文
 public class UserHolder {

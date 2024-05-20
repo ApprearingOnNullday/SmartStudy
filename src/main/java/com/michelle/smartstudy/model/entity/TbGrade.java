@@ -7,43 +7,44 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
  * <p>
- * 用户表
+ * 分数表
  * </p>
  *
  * @author AppearingOnNullday
  * @since 2024-05-20
  */
-@TableName("tb_user")
+@TableName("tb_grade")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TbUser implements Serializable {
+public class TbGrade implements Serializable {
 
     /**
-     * 自增主键ID（用户id）
+     * 自增主键ID
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     /**
-     * 用户名
+     * 提交id
      */
-    private String username;
+    private Integer submissionId;
 
     /**
-     * 密码
+     * 分数
      */
-    private String password;
+    private BigDecimal score;
 
     /**
-     * 角色
+     * 教师评语
      */
-    private Integer role;
+    private String comment;
 
     /**
      * 软删标识，0：未删除，1：已删除
@@ -75,11 +76,11 @@ public class TbUser implements Serializable {
         if (getClass() != that.getClass()) {
             return false;
         }
-        TbUser other = (TbUser) that;
+        TbGrade other = (TbGrade) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-                && (this.getUsername() == null ? other.getUsername() == null : this.getUsername().equals(other.getUsername()))
-                && (this.getPassword() == null ? other.getPassword() == null : this.getPassword().equals(other.getPassword()))
-                && (this.getPassword() == null ? other.getRole() == null : this.getRole().equals(other.getRole()))
+                && (this.getSubmissionId() == null ? other.getSubmissionId() == null : this.getSubmissionId().equals(other.getSubmissionId()))
+                && (this.getScore() == null ? other.getScore() == null : this.getScore().equals(other.getScore()))
+                && (this.getComment() == null ? other.getComment() == null : this.getComment().equals(other.getComment()))
                 && (this.getDeleted() == null ? other.getDeleted() == null : this.getDeleted().equals(other.getDeleted()))
                 && (this.getCtime() == null ? other.getCtime() == null : this.getCtime().equals(other.getCtime()))
                 && (this.getMtime() == null ? other.getMtime() == null : this.getMtime().equals(other.getMtime()));
@@ -90,9 +91,9 @@ public class TbUser implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
-        result = prime * result + ((getUsername() == null) ? 0 : getUsername().hashCode());
-        result = prime * result + ((getPassword() == null) ? 0 : getPassword().hashCode());
-        result = prime * result + ((getRole() == null) ? 0 : getRole().hashCode());
+        result = prime * result + ((getSubmissionId() == null) ? 0 : getSubmissionId().hashCode());
+        result = prime * result + ((getScore() == null) ? 0 : getScore().hashCode());
+        result = prime * result + ((getComment() == null) ? 0 : getComment().hashCode());
         result = prime * result + ((getDeleted() == null) ? 0 : getDeleted().hashCode());
         result = prime * result + ((getCtime() == null) ? 0 : getCtime().hashCode());
         result = prime * result + ((getMtime() == null) ? 0 : getMtime().hashCode());
@@ -106,9 +107,9 @@ public class TbUser implements Serializable {
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
-        sb.append(", username=").append(username);
-        sb.append(", password=").append(password);
-        sb.append(", role=").append(role);
+        sb.append(", submissionId=").append(submissionId);
+        sb.append(", score=").append(score);
+        sb.append(", comment=").append(comment);
         sb.append(", deleted=").append(deleted);
         sb.append(", ctime=").append(ctime);
         sb.append(", mtime=").append(mtime);

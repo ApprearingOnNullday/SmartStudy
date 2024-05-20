@@ -1,16 +1,16 @@
 package com.michelle.smartstudy.model.enums;
 
-public enum ReadStatusEnum {
+public enum CorrectingStatusEnum {
 
-    READ(1, "已读"),
+    CORRECTED(1, "已批改"),
 
-    UNREAD(2, "未读");
+    UNCORRECTED(2, "未批改");
 
     private Integer code;
 
     private String desc;
 
-    ReadStatusEnum(int code, String desc) {
+    CorrectingStatusEnum(int code, String desc) {
         this.code = code;
         this.desc = desc;
     }
@@ -32,8 +32,8 @@ public enum ReadStatusEnum {
     }
 
     public static String getDescByCode(Integer code) {
-        ReadStatusEnum[] values = ReadStatusEnum.values();
-        for (ReadStatusEnum status : values) {
+        CorrectingStatusEnum[] values = CorrectingStatusEnum.values();
+        for (CorrectingStatusEnum status : values) {
             if (status.code.equals(code)) {
                 return status.getDesc();
             }

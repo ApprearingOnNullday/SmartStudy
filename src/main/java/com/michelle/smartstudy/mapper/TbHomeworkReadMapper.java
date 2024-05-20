@@ -1,17 +1,17 @@
 package com.michelle.smartstudy.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.michelle.smartstudy.model.entity.TbHomework;
+import com.michelle.smartstudy.model.entity.TbHomeworkRead;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
  * <p>
- * 作业表 Mapper 接口
+ * 作业已读表 Mapper 接口
  * </p>
  *
  * @author AppearingOnNullday
  * @since 2024-05-20
  */
 @Mapper
-public interface TbHomeworkMapper extends BaseMapper<TbHomework> {
+public interface TbHomeworkReadMapper extends BaseMapper<TbHomeworkRead> {
 }

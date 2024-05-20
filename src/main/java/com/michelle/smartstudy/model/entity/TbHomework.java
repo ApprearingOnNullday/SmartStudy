@@ -11,39 +11,49 @@ import java.time.LocalDateTime;
 
 /**
  * <p>
- * 用户表
+ * 作业表
  * </p>
  *
  * @author AppearingOnNullday
  * @since 2024-05-20
  */
-@TableName("tb_user")
+@TableName("tb_homework")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TbUser implements Serializable {
+public class TbHomework implements Serializable {
 
     /**
-     * 自增主键ID（用户id）
+     * 自增主键ID（作业id）
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     /**
-     * 用户名
+     * 作业标题
      */
-    private String username;
+    private String title;
 
     /**
-     * 密码
+     * 课程id
      */
-    private String password;
+    private Integer courseId;
 
     /**
-     * 角色
+     * 作业详情
      */
-    private Integer role;
+    private String description;
+
+    /**
+     * 开始时间
+     */
+    private LocalDateTime start;
+
+    /**
+     * 截止时间
+     */
+    private LocalDateTime end;
 
     /**
      * 软删标识，0：未删除，1：已删除
@@ -75,11 +85,13 @@ public class TbUser implements Serializable {
         if (getClass() != that.getClass()) {
             return false;
         }
-        TbUser other = (TbUser) that;
+        TbHomework other = (TbHomework) that;
         return (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
-                && (this.getUsername() == null ? other.getUsername() == null : this.getUsername().equals(other.getUsername()))
-                && (this.getPassword() == null ? other.getPassword() == null : this.getPassword().equals(other.getPassword()))
-                && (this.getPassword() == null ? other.getRole() == null : this.getRole().equals(other.getRole()))
+                && (this.getTitle() == null ? other.getTitle() == null : this.getTitle().equals(other.getTitle()))
+                && (this.getCourseId() == null ? other.getCourseId() == null : this.getCourseId().equals(other.getCourseId()))
+                && (this.getDescription() == null ? other.getDescription() == null : this.getDescription().equals(other.getDescription()))
+                && (this.getStart() == null ? other.getStart() == null : this.getStart().equals(other.getStart()))
+                && (this.getEnd() == null ? other.getEnd() == null : this.getEnd().equals(other.getEnd()))
                 && (this.getDeleted() == null ? other.getDeleted() == null : this.getDeleted().equals(other.getDeleted()))
                 && (this.getCtime() == null ? other.getCtime() == null : this.getCtime().equals(other.getCtime()))
                 && (this.getMtime() == null ? other.getMtime() == null : this.getMtime().equals(other.getMtime()));
@@ -90,9 +102,11 @@ public class TbUser implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
-        result = prime * result + ((getUsername() == null) ? 0 : getUsername().hashCode());
-        result = prime * result + ((getPassword() == null) ? 0 : getPassword().hashCode());
-        result = prime * result + ((getRole() == null) ? 0 : getRole().hashCode());
+        result = prime * result + ((getTitle() == null) ? 0 : getTitle().hashCode());
+        result = prime * result + ((getCourseId() == null) ? 0 : getCourseId().hashCode());
+        result = prime * result + ((getDescription() == null) ? 0 : getDescription().hashCode());
+        result = prime * result + ((getStart() == null) ? 0 : getStart().hashCode());
+        result = prime * result + ((getEnd() == null) ? 0 : getEnd().hashCode());
         result = prime * result + ((getDeleted() == null) ? 0 : getDeleted().hashCode());
         result = prime * result + ((getCtime() == null) ? 0 : getCtime().hashCode());
         result = prime * result + ((getMtime() == null) ? 0 : getMtime().hashCode());
@@ -106,9 +120,11 @@ public class TbUser implements Serializable {
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
         sb.append(", id=").append(id);
-        sb.append(", username=").append(username);
-        sb.append(", password").append(password);
-        sb.append(", role").append(role);
+        sb.append(", title=").append(title);
+        sb.append(", courseId=").append(courseId);
+        sb.append(", description=").append(description);
+        sb.append(", start=").append(start);
+        sb.append(", end=").append(end);
         sb.append(", deleted=").append(deleted);
         sb.append(", ctime=").append(ctime);
         sb.append(", mtime=").append(mtime);

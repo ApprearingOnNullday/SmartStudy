@@ -1,10 +1,10 @@
-package com.mizore.easybuy.model.enums;
+package com.michelle.smartstudy.model.enums;
 
 public enum RoleEnum {
 
-    BUYER(1, "普通买家"),
+    STUDENT(1, "学生"),
 
-    SELLER(2, "卖家"),
+    TEACHER(2, "教师"),
 
     ADMIN(3, "管理员");
 
@@ -31,5 +31,15 @@ public enum RoleEnum {
 
     public void setDesc(String desc) {
         this.desc = desc;
+    }
+
+    public static String getDescByCode(Integer code) {
+        RoleEnum[] values = RoleEnum.values();
+        for (RoleEnum role : values) {
+            if (role.code.equals(code)) {
+                return role.getDesc();
+            }
+        }
+        return null;
     }
 }

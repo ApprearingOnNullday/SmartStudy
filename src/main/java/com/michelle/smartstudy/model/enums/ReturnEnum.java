@@ -1,4 +1,4 @@
-package com.mizore.easybuy.model.enums;
+package com.michelle.smartstudy.model.enums;
 
 public enum ReturnEnum {
     SUCCESS("成功", 200),
