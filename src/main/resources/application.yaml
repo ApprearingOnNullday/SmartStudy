@@ -18,7 +18,7 @@ spring:
     virtual-host: vhost01 #虚拟主机
 
 jwt:
-  secret-key-str: huHAQ21P5fsGgpnHKipREwz4zgwUxJ8bGl+gmW4mbl4=
+  secret-key-str: VGhpcyBpcyBTQSBHcm91cCAxMi5IYXZlIHRvIGJ1aWxkIGEga2V5IGxvbmcgZW5vdWdoIGZvciB0aGUgYWxnb3JpdGhtIHRvIHJ1bg==
   # token 有效期 单位：天
   ttl: 99
 
