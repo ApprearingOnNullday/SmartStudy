@@ -1,0 +1,35 @@
+server:
+  port: 8081
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/SmartStudy?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: 1234
+
+  jackson:
+    default-property-inclusion: non_null # JSON处理时忽略非空字段
+
+  rabbitmq:
+    host: localhost
+    username: Michelle
+    password: 1234
+    port: 5672
+    virtual-host: vhost01 #虚拟主机
+
+jwt:
+  secret-key-str: huHAQ21P5fsGgpnHKipREwz4zgwUxJ8bGl+gmW4mbl4=
+  # token 有效期 单位：天
+  ttl: 99
+
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+
+# 开启 MyBatis Plus SQL 打印
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+logging:
+  level:
+    com.baomidou.mybatisplus.core: debug
