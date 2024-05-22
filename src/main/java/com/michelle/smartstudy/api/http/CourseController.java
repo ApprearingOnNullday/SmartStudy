@@ -1,7 +1,10 @@
 package com.michelle.smartstudy.api.http;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.michelle.smartstudy.model.query.CourseAddQuery;
+import com.michelle.smartstudy.model.vo.BaseVO;
+import com.michelle.smartstudy.service.business.CourseService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * <p>
@@ -14,4 +17,30 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/course")
 public class CourseController {
+
+    @Autowired
+    private CourseService courseService;
+
+    /**
+     * 添加（创建）课程
+     */
+    @PostMapping("/add")
+    public BaseVO<Object> addCourse(
+            @RequestBody CourseAddQuery courseAddQuery
+    ) {
+        return courseService.addCourse(courseAddQuery);
+    }
+
+    /**
+     * 删除课程
+     * @param id 课程id
+     * @return
+     */
+    @PostMapping("/del/{id}")
+    public BaseVO<Object> deleteCourse(
+            @PathVariable(value = "id") Integer id
+    ) {
+        return courseService.deleteCourse(id);
+    }
+
 }
