@@ -1,10 +1,7 @@
 package com.michelle.smartstudy.config;
 
 import lombok.Data;
-import org.springframework.amqp.core.ExchangeBuilder;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.QueueBuilder;
-import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -19,9 +16,14 @@ public class RabbitMQConfig {
 
     private String courseExcName = "courseTopicExchange";   // 交换机名称
 
+//    @Bean
+//    public TopicExchange topicExchange() {
+//        return ExchangeBuilder.topicExchange(courseExcName).build();
+//    }
+
     @Bean
-    public TopicExchange topicExchange() {
-        return ExchangeBuilder.topicExchange(courseExcName).build();
+    public DirectExchange directExchange() {
+        return ExchangeBuilder.directExchange(courseExcName).build();
     }
 
     @Bean

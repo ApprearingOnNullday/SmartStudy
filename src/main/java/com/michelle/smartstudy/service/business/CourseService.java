@@ -9,10 +9,7 @@ import com.michelle.smartstudy.mq.consumer.HomeworkConsumerManager;
 import com.michelle.smartstudy.service.base.ITbCourseService;
 import com.michelle.smartstudy.utils.UserHolder;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,8 +21,11 @@ public class CourseService {
     @Autowired
     private RabbitAdmin rabbitAdmin;
 
+//    @Autowired
+//    private TopicExchange topicExchange;
+
     @Autowired
-    private TopicExchange topicExchange;
+    private DirectExchange directExchange;
 
     @Autowired
     private HomeworkConsumerManager hwConsumer;
@@ -61,7 +61,7 @@ public class CourseService {
             Queue queue = new Queue(courseName);
             rabbitAdmin.declareQueue(queue);
             // 绑定队列到交换机
-            Binding binding = BindingBuilder.bind(queue).to(topicExchange).with(courseName);
+            Binding binding = BindingBuilder.bind(queue).to(directExchange).with(courseName);
             rabbitAdmin.declareBinding(binding);
 
             log.info("Course " + courseName + " added successfully!");
