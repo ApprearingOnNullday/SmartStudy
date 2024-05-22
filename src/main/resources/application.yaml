@@ -16,6 +16,7 @@ spring:
     password: 1234
     port: 5672
     virtual-host: vhost01 #虚拟主机
+    courseExcName: courseTopicExchange #课程Topic交换机
 
 jwt:
   secret-key-str: VGhpcyBpcyBTQSBHcm91cCAxMi5IYXZlIHRvIGJ1aWxkIGEga2V5IGxvbmcgZW5vdWdoIGZvciB0aGUgYWxnb3JpdGhtIHRvIHJ1bg==
