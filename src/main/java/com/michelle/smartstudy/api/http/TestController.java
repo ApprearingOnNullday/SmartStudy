@@ -20,9 +20,6 @@ import java.time.format.DateTimeFormatter;
 public class TestController {
 
     @Autowired
-    private ITbHomeworkService tbHomeworkService;
-
-    @Autowired
     private HomeworkProducer homeworkProducer;
 
     private int version;
