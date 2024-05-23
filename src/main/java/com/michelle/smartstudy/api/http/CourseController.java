@@ -2,9 +2,12 @@ package com.michelle.smartstudy.api.http;
 
 import com.michelle.smartstudy.model.query.CourseAddQuery;
 import com.michelle.smartstudy.model.vo.BaseVO;
+import com.michelle.smartstudy.model.vo.CourseInfo4StudentsVO;
 import com.michelle.smartstudy.service.business.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * <p>
@@ -41,6 +44,14 @@ public class CourseController {
             @PathVariable(value = "id") Integer id
     ) {
         return courseService.deleteCourse(id);
+    }
+
+    /**
+     * 学生查看系统中所有已有课程
+     */
+    @GetMapping("/student/display/all")
+    public BaseVO<List<CourseInfo4StudentsVO>> getAllForStudent() {
+        return courseService.getAllForStudent();
     }
 
 }
