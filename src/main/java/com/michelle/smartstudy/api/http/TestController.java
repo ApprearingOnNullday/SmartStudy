@@ -1,6 +1,6 @@
 package com.michelle.smartstudy.api.http;
 
-import com.michelle.smartstudy.model.entity.TbHomework;
+import com.michelle.smartstudy.model.dto.HomeworkDTO;
 import com.michelle.smartstudy.model.vo.BasePageVO;
 import com.michelle.smartstudy.model.vo.BaseVO;
 import com.michelle.smartstudy.mq.producer.HomeworkProducer;
@@ -10,14 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 @RestController
 @RequestMapping("/test")
 @ConfigurationProperties(prefix = "test")
 @Setter
 public class TestController {
-
-    @Autowired
-    private ITbHomeworkService tbHomeworkService;
 
     @Autowired
     private HomeworkProducer homeworkProducer;
@@ -36,19 +36,26 @@ public class TestController {
         return basePageVO;
     }
 
-//    @PostMapping("/hwProducer")
-//    public BaseVO testProducer(
-//            @RequestParam(value="queueName") String queueName
-//    ) {
-//        TbHomework tbHomework = new TbHomework();
-//        tbHomework.setTitle("SA hw1");
-//        tbHomework.setCourseId(8);
-//        tbHomework.setDescription("finish Ontime");
-//        tbHomeworkService.save(tbHomework);
-//
-//        TbHomework newHW = tbHomeworkService.getById(tbHomework.getId());
-//        homeworkProducer.sendMsg(queueName, newHW);
-//        return new BaseVO().success();
-//    }
+    @PostMapping("/hwProducer")
+    public BaseVO testProducer(
+            @RequestParam(value="queueName") String queueName
+    ) {
+        String startTime = "2024-05-15T18:00:00";
+        String endTime = "2024-05-29T00:00:00";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        LocalDateTime start = LocalDateTime.parse(startTime, formatter);
+        LocalDateTime end = LocalDateTime.parse(endTime, formatter);
+
+        HomeworkDTO homeworkDTO = HomeworkDTO.builder()
+                .title("SA第2次小组作业")
+                .courseId(16)
+                .description("请为A、B、C三个数据库服务器设计几种冗余方案。")
+                .start(start)
+                .end(end)
+                .build();
+
+        homeworkProducer.sendMsg(queueName, homeworkDTO);
+        return new BaseVO().success();
+    }
 
 }
