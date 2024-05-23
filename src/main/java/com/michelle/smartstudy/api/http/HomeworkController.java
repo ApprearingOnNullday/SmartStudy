@@ -1,7 +1,10 @@
 package com.michelle.smartstudy.api.http;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.michelle.smartstudy.model.query.HWAssignQuery;
+import com.michelle.smartstudy.model.vo.BaseVO;
+import com.michelle.smartstudy.service.business.HomeworkService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * <p>
@@ -14,4 +17,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/homework")
 public class HomeworkController {
+
+    @Autowired
+    private HomeworkService homeworkService;
+
+    /**
+     * 布置作业
+     * @param id 课程id
+     * @param hwAssignQuery 作业信息
+     */
+    @PostMapping("/assign/{id}")
+    public BaseVO<Object> assign(
+            @PathVariable(value = "id") Integer id,
+            @RequestBody HWAssignQuery hwAssignQuery
+    ) {
+        return homeworkService.assign(id, hwAssignQuery);
+    }
+
 }
