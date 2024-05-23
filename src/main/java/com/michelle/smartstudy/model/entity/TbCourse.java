@@ -46,6 +46,11 @@ public class TbCourse implements Serializable {
     private String description;
 
     /**
+     * 选课人数
+     */
+    private Integer enrollment;
+
+    /**
      * 软删标识，0：未删除，1：已删除
      */
     @TableLogic
@@ -80,6 +85,7 @@ public class TbCourse implements Serializable {
                 && (this.getTitle() == null ? other.getTitle() == null : this.getTitle().equals(other.getTitle()))
                 && (this.getTeacherId() == null ? other.getTeacherId() == null : this.getTeacherId().equals(other.getTeacherId()))
                 && (this.getDescription() == null ? other.getDescription() == null : this.getDescription().equals(other.getDescription()))
+                && (this.getEnrollment() == null ? other.getEnrollment() == null : this.getEnrollment().equals(other.getEnrollment()))
                 && (this.getDeleted() == null ? other.getDeleted() == null : this.getDeleted().equals(other.getDeleted()))
                 && (this.getCtime() == null ? other.getCtime() == null : this.getCtime().equals(other.getCtime()))
                 && (this.getMtime() == null ? other.getMtime() == null : this.getMtime().equals(other.getMtime()));
@@ -93,6 +99,7 @@ public class TbCourse implements Serializable {
         result = prime * result + ((getTitle() == null) ? 0 : getTitle().hashCode());
         result = prime * result + ((getTeacherId() == null) ? 0 : getTeacherId().hashCode());
         result = prime * result + ((getDescription() == null) ? 0 : getDescription().hashCode());
+        result = prime * result + ((getEnrollment() == null) ? 0 : getEnrollment().hashCode());
         result = prime * result + ((getDeleted() == null) ? 0 : getDeleted().hashCode());
         result = prime * result + ((getCtime() == null) ? 0 : getCtime().hashCode());
         result = prime * result + ((getMtime() == null) ? 0 : getMtime().hashCode());
@@ -109,6 +116,7 @@ public class TbCourse implements Serializable {
         sb.append(", title=").append(title);
         sb.append(", teacherId=").append(teacherId);
         sb.append(", description=").append(description);
+        sb.append(", enrollment=").append(enrollment);
         sb.append(", deleted=").append(deleted);
         sb.append(", ctime=").append(ctime);
         sb.append(", mtime=").append(mtime);

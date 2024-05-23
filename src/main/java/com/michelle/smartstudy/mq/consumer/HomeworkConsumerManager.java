@@ -52,7 +52,7 @@ public class HomeworkConsumerManager {
             // 在收到对应队列中的消息时会执行handleMessage方法
             public void handleMessage(byte[] body) {
                 // 根据队列名称进行操作(只是为了说明可以获取到队列名称)
-                System.out.println("Received homework for " + queueName);
+                log.info("Received homework for " + queueName);
                 // 检查收到的内容
                 if (body == null || body.length == 0) {
                     log.error("null msg");

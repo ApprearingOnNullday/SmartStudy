@@ -36,4 +36,9 @@ public class CourseInfo4StudentsVO {
      */
     private String teacherName;
 
+    /**
+     * 选课人数
+     */
+    private Integer enrollment;
+
 }
