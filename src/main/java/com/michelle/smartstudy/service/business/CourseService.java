@@ -147,6 +147,7 @@ public class CourseService {
                             .description(x.getDescription())
                             .teacherId(x.getTeacherId())
                             .teacherName(teacherMap.get(x.getTeacherId()))
+                            .enrollment(x.getEnrollment())
                             .build();
                 }
         ).toList();
@@ -181,6 +182,11 @@ public class CourseService {
                         .build();
                 // 将选课记录插入DB
                 tbStudentCourseService.save(newRecord);
+                // 对所选课程的选课人数+1
+                TbCourse course = tbCourseService.getById(courseId);
+                course.setEnrollment(course.getEnrollment() + 1);
+                tbCourseService.updateById(course);
+
                 return baseVO.success().setData("选课成功！");
             }
         } else {    // 不为学生角色，不能进行选课
@@ -234,6 +240,7 @@ public class CourseService {
                             .description(x.getDescription())
                             .teacherId(x.getTeacherId())
                             .teacherName(teacherMap.get(x.getTeacherId()))
+                            .enrollment(x.getEnrollment())
                             .build();
                 }
         ).toList();
