@@ -3,9 +3,12 @@ package com.michelle.smartstudy.api.http;
 import com.michelle.smartstudy.model.query.HWAssignQuery;
 import com.michelle.smartstudy.model.query.HWSubmitQuery;
 import com.michelle.smartstudy.model.vo.BaseVO;
+import com.michelle.smartstudy.model.vo.HWInfo4TeachersVO;
 import com.michelle.smartstudy.service.business.HomeworkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * <p>
@@ -44,6 +47,17 @@ public class HomeworkController {
             @RequestBody HWSubmitQuery hwSubmitQuery
     ) {
         return homeworkService.submit(hwSubmitQuery);
+    }
+
+    /**
+     * 教师查看自己某门课的所有已布置作业
+     * @param id 课程id
+     */
+    @GetMapping("/displayAll/{id}")
+    public BaseVO<List<HWInfo4TeachersVO>> teacherGetAll(
+            @PathVariable(value = "id") Integer id
+    ) {
+        return homeworkService.teacherGetAll(id);
     }
 
 }
