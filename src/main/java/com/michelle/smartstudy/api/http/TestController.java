@@ -6,7 +6,6 @@ import com.michelle.smartstudy.model.vo.BasePageVO;
 import com.michelle.smartstudy.model.vo.BaseVO;
 import com.michelle.smartstudy.mq.producer.HomeworkProducer;
 import com.michelle.smartstudy.mq.producer.SubmissionProducer;
-import com.michelle.smartstudy.service.base.ITbHomeworkService;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;

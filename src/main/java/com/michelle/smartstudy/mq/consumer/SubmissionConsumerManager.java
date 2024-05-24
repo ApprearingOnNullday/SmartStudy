@@ -2,11 +2,8 @@ package com.michelle.smartstudy.mq.consumer;
 
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.michelle.smartstudy.model.dto.HomeworkDTO;
 import com.michelle.smartstudy.model.dto.SubmissionDTO;
-import com.michelle.smartstudy.model.entity.TbHomework;
 import com.michelle.smartstudy.model.entity.TbHomeworkRead;
-import com.michelle.smartstudy.model.entity.TbStudentCourse;
 import com.michelle.smartstudy.model.entity.TbSubmission;
 import com.michelle.smartstudy.model.enums.CorrectingStatusEnum;
 import com.michelle.smartstudy.model.enums.ReadStatusEnum;
@@ -20,7 +17,6 @@ import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -58,7 +54,7 @@ public class SubmissionConsumerManager {
                 // 根据队列名称进行操作(只是为了说明可以获取到队列名称)
                 log.info("Received submission for " + queueName + ", msgNum: {}", msgNum);
                 // 当收到足够多的submission时，可以给老师发邮件提醒批改作业（大概体现了MQ的异步）
-                if(msgNum == LIMIT) {
+                if(msgNum.equals(LIMIT)) {
                     // todo：发邮件
                     msgNum = 0;     // 重置
                 }
