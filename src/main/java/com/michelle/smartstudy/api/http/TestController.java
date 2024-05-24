@@ -1,10 +1,11 @@
 package com.michelle.smartstudy.api.http;
 
 import com.michelle.smartstudy.model.dto.HomeworkDTO;
+import com.michelle.smartstudy.model.dto.SubmissionDTO;
 import com.michelle.smartstudy.model.vo.BasePageVO;
 import com.michelle.smartstudy.model.vo.BaseVO;
 import com.michelle.smartstudy.mq.producer.HomeworkProducer;
-import com.michelle.smartstudy.service.base.ITbHomeworkService;
+import com.michelle.smartstudy.mq.producer.SubmissionProducer;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -21,6 +22,9 @@ public class TestController {
 
     @Autowired
     private HomeworkProducer homeworkProducer;
+
+    @Autowired
+    private SubmissionProducer submissionProducer;
 
     private int version;
 
@@ -55,6 +59,24 @@ public class TestController {
                 .build();
 
         homeworkProducer.sendMsg(queueName, homeworkDTO);
+        return new BaseVO().success();
+    }
+
+    @PostMapping("/subProducer")
+    public BaseVO testSubProducer(
+            @RequestParam(value="queueName") String queueName
+    ) {
+
+        LocalDateTime subTime = LocalDateTime.now();
+
+        SubmissionDTO submissionDTO = SubmissionDTO.builder()
+                .studentId(1)
+                .homeworkId(24)
+                .submitTime(subTime)
+                .content("设计方案见附件PPT。")
+                .build();
+
+        submissionProducer.sendMsg(queueName, submissionDTO);
         return new BaseVO().success();
     }
 

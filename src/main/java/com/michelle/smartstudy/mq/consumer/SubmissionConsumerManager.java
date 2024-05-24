@@ -1,5 +1,14 @@
 package com.michelle.smartstudy.mq.consumer;
 
+import com.alibaba.fastjson2.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.michelle.smartstudy.model.dto.SubmissionDTO;
+import com.michelle.smartstudy.model.entity.TbHomeworkRead;
+import com.michelle.smartstudy.model.entity.TbSubmission;
+import com.michelle.smartstudy.model.enums.CorrectingStatusEnum;
+import com.michelle.smartstudy.model.enums.ReadStatusEnum;
+import com.michelle.smartstudy.service.base.ITbHomeworkReadService;
+import com.michelle.smartstudy.service.base.ITbSubmissionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -21,9 +30,17 @@ public class SubmissionConsumerManager {
     @Autowired
     private AmqpAdmin amqpAdmin;
 
+    @Autowired
+    private ITbSubmissionService tbSubmissionService;
+
+    @Autowired
+    private ITbHomeworkReadService tbHomeworkReadService;
+
     private final Map<String, SimpleMessageListenerContainer> listenerContainers = new ConcurrentHashMap<>();
 
     private static Integer msgNum = 0;
+
+    private static final Integer LIMIT = 3;     // 该队列累计收到多少作业后会给任课老师发邮件
 
     // 动态生成对应队列的Consumer（每个课程都有一个对应的submissionqueue和与其对应的consumer）
     public void addConsumer(String queueName) {
@@ -35,31 +52,48 @@ public class SubmissionConsumerManager {
             public void handleMessage(byte[] body) {
                 msgNum++;
                 // 根据队列名称进行操作(只是为了说明可以获取到队列名称)
-                log.info("Received homework for " + queueName + ", msgNum: {}", msgNum);
+                log.info("Received submission for " + queueName + ", msgNum: {}", msgNum);
+                // 当收到足够多的submission时，可以给老师发邮件提醒批改作业（大概体现了MQ的异步）
+                if(msgNum.equals(LIMIT)) {
+                    // todo：发邮件
+                    msgNum = 0;     // 重置
+                }
                 // 检查收到的内容
                 if (body == null || body.length == 0) {
                     log.error("null msg");
                 } else {    // 信息不为空
                     String msg = new String(body);
                     log.info("receive message {}", msg);
+
+                    // 解析信息为SubmissionDTO
+                    SubmissionDTO submissionDTO = JSON.parseObject(msg, SubmissionDTO.class);
+//                    System.out.println(submissionDTO);
+                    // 从SubmissionDTO中获取提交对应的作业id
+                    Integer homeworkId = submissionDTO.getHomeworkId();   // 作业id
+                    // 创建TbSubmission，并插入DB中
+                    TbSubmission submission = TbSubmission.builder()
+                            .studentId(submissionDTO.getStudentId())
+                            .homeworkId(homeworkId)
+                            .submitTime(submissionDTO.getSubmitTime())
+                            .content(submissionDTO.getContent())
+                            .status(CorrectingStatusEnum.UNCORRECTED.getCode())
+                            .build();
+                    // 存入tb_submission表中
+                    tbSubmissionService.save(submission);
+                    // 将tb_homework_read对应的表项状态update为1--已完成
+                    TbHomeworkRead record = tbHomeworkReadService.getOne(new QueryWrapper<TbHomeworkRead>()
+                            .eq("student_id", submissionDTO.getStudentId())
+                            .eq("homework_id", submissionDTO.getHomeworkId()));
+                    if(record == null) {
+                        log.error("不存在该条作业记录");
+                    } else {
+                        // 更新该学生的该条作业为已完成状态
+                        record.setStatus(ReadStatusEnum.FINISTHED.getCode());
+                        tbHomeworkReadService.updateById(record);
+                    }
                 }
                 // 这里可以添加更多基于队列名称的逻辑
-            }
-            /*
-            // 在 handleMessage 方法内部，可以显式调用底下这些方法这些辅助方法来处理消息。
-            // 定义其他方法
-            private void processHomework(String homework) {
-                // 解析作业内容或其他处理逻辑
-                System.out.println("Processing homework: " + homework);
-                // 假设进行一些处理
-                String result = analyzeHomework(homework);
-                System.out.println("Homework analysis result: " + result);
-            }
-
-            private String analyzeHomework(String homework) {
-                // 模拟作业分析
-                return "Analysis of " + homework;
-            } */
+            }// handleMessage
         }));
         container.start();  // 启动监听容器
         // 将Container保存到map
