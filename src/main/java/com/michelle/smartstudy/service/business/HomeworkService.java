@@ -1,22 +1,28 @@
 package com.michelle.smartstudy.service.business;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.google.common.collect.Maps;
 import com.michelle.smartstudy.model.dto.HomeworkDTO;
 import com.michelle.smartstudy.model.dto.SubmissionDTO;
 import com.michelle.smartstudy.model.dto.UserDTO;
 import com.michelle.smartstudy.model.entity.TbCourse;
 import com.michelle.smartstudy.model.entity.TbHomework;
 import com.michelle.smartstudy.model.entity.TbSubmission;
+import com.michelle.smartstudy.model.entity.TbUser;
+import com.michelle.smartstudy.model.enums.CorrectingStatusEnum;
 import com.michelle.smartstudy.model.query.HWAssignQuery;
 import com.michelle.smartstudy.model.query.HWSubmitQuery;
 import com.michelle.smartstudy.model.vo.BaseVO;
 import com.michelle.smartstudy.model.vo.HWInfo4TeachersVO;
+import com.michelle.smartstudy.model.vo.SubmittedHWInfo4TeachersVO;
 import com.michelle.smartstudy.mq.producer.HomeworkProducer;
 import com.michelle.smartstudy.mq.producer.SubmissionProducer;
 import com.michelle.smartstudy.service.base.ITbCourseService;
 import com.michelle.smartstudy.service.base.ITbHomeworkService;
 import com.michelle.smartstudy.service.base.ITbSubmissionService;
+import com.michelle.smartstudy.service.base.ITbUserService;
 import com.michelle.smartstudy.utils.UserHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +33,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -46,6 +53,9 @@ public class HomeworkService {
 
     @Autowired
     private ITbSubmissionService tbSubmissionService;
+
+    @Autowired
+    private ITbUserService tbUserService;
 
     // 教师布置作业
     public BaseVO<Object> assign(Integer id, HWAssignQuery hwAssignQuery) {
@@ -93,7 +103,7 @@ public class HomeworkService {
 
         // 向该课程对应的消息队列中发送一条作业message
         submissionProducer.sendMsg(queueName, submissionDTO);
-        log.info("send msg : {}  To queue: {}", submissionDTO, courseName);
+        log.info("send msg : {}  To queue: {}", submissionDTO, courseName+"sub");
         return new BaseVO<>().success().setData("已成功提交作业！");
     }
 
@@ -141,4 +151,50 @@ public class HomeworkService {
         baseVO.setData(infos);
         return baseVO;
     }
+
+    // 教师查看自己某门课程布置的某个作业的所有提交记录
+    public BaseVO<List<SubmittedHWInfo4TeachersVO>> teacherGetSubmit(Integer homeworkId) {
+        // 根据作业id在提交表tb_submission中查询所有条目，并按submit_time的正序排序
+        LambdaQueryWrapper<TbSubmission> query = new LambdaQueryWrapper<>();
+        query.eq(TbSubmission::getHomeworkId, homeworkId)
+                .orderByAsc(TbSubmission::getSubmitTime);   // 先显示提交的早的
+        List<TbSubmission> submissions = tbSubmissionService.list(query);
+        // studentId -> studentName Map<学生id, 学生姓名>
+        Map<Integer, String> studentMap;
+        // 1.所有提交记录中涉及到的学生id
+        List<Integer> studentIds = submissions.stream()
+                .map(TbSubmission::getStudentId)
+                .toList();
+        // 2.根据得到的学生id到tb_user表中查对应的userName
+        if (CollectionUtil.isEmpty(studentIds)) {
+            studentMap = Maps.newHashMap();
+            log.error("empty student ids");
+        } else {
+            List<TbUser> students = tbUserService.listByIds(studentIds);
+            studentMap = students.stream()
+                    .collect(Collectors.toMap(TbUser::getId, TbUser::getUsername));
+        }
+        // 转换为VO（List<TbSubmission> -> List<SubmittedHWInfo4TeachersVO>）
+        List<SubmittedHWInfo4TeachersVO> infos = submissions.stream().map(
+                x -> {
+                    Integer studentId = x.getStudentId();   // 学生id
+                    Integer status = x.getStatus(); // 批改状态
+                    return SubmittedHWInfo4TeachersVO.builder()
+                            .submitId(x.getId())
+                            .studentId(studentId)
+                            .studentName(studentMap.get(studentId))
+                            .submitTime(x.getSubmitTime())
+                            .content(x.getContent())
+                            .status(status)
+                            .statusDesc(CorrectingStatusEnum.getDescByCode(status))
+                            .build();
+                }
+        ).toList();
+
+        BaseVO<List<SubmittedHWInfo4TeachersVO>> baseVO =
+                new BaseVO<List<SubmittedHWInfo4TeachersVO>>().success();
+        baseVO.setData(infos);
+        return baseVO;
+    }
+
 }
