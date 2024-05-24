@@ -2,8 +2,6 @@ package com.michelle.smartstudy.model.query;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
-
 @Data
 public class HWAssignQuery {
 
