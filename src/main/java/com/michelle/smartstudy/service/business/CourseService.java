@@ -4,17 +4,14 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Maps;
 import com.michelle.smartstudy.model.dto.UserDTO;
-import com.michelle.smartstudy.model.entity.TbCourse;
-import com.michelle.smartstudy.model.entity.TbStudentCourse;
-import com.michelle.smartstudy.model.entity.TbUser;
+import com.michelle.smartstudy.model.entity.*;
 import com.michelle.smartstudy.model.enums.RoleEnum;
 import com.michelle.smartstudy.model.query.CourseAddQuery;
 import com.michelle.smartstudy.model.vo.BaseVO;
+import com.michelle.smartstudy.model.vo.ChosenCourseInfo4StudentsVO;
 import com.michelle.smartstudy.model.vo.CourseInfo4StudentsVO;
 import com.michelle.smartstudy.mq.consumer.HomeworkConsumerManager;
-import com.michelle.smartstudy.service.base.ITbCourseService;
-import com.michelle.smartstudy.service.base.ITbStudentCourseService;
-import com.michelle.smartstudy.service.base.ITbUserService;
+import com.michelle.smartstudy.service.base.*;
 import com.michelle.smartstudy.utils.UserHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.*;
@@ -22,6 +19,7 @@ import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -50,6 +48,12 @@ public class CourseService {
 
     @Autowired
     private ITbStudentCourseService tbStudentCourseService;
+
+    @Autowired
+    private ITbHomeworkService tbHomeworkService;
+
+    @Autowired
+    private ITbHomeworkReadService tbHomeworkReadService;
 
     /**
      * 添加（创建）课程，创建以课程名命名的消息队列，并连接到交换机courseTopicExchange
@@ -198,7 +202,7 @@ public class CourseService {
     /**
      * 查找当前登录学生用户的已选课程
      */
-    public BaseVO<List<CourseInfo4StudentsVO>> getChosen() {
+    public BaseVO<List<ChosenCourseInfo4StudentsVO>> getChosen() {
         // 获取当前学生用户
         UserDTO user = UserHolder.get();
         // 学生id
@@ -213,7 +217,6 @@ public class CourseService {
                 .toList();
         // 从课程表中批查得到相关的课程信息
         List<TbCourse> courses = tbCourseService.listByIds(courseIds);
-        // todo：底下和学生查看所有课程代码对应的部分一模一样……感觉这两部分可能可以实现的更好吧
         // 获取所有涉及到的teacherId
         List<Integer> teacherIds = courses.stream()
                 .map(TbCourse::getTeacherId)
@@ -230,23 +233,52 @@ public class CourseService {
             teacherMap = teachers.stream()
                     .collect(Collectors.toMap(TbUser::getId, TbUser::getUsername));
         }
+        // 获得该学生在course列表中每门课分别有几个未完成作业
+        // 1. courseId与该门课程对应的所有作业id（List<Homework>）的映射
+        // 创建Map来存储每个课程ID对应的作业列表
+        Map<Integer, List<TbHomework>> courseIdToHomeworkMap = courseIds.stream()
+                .collect(Collectors.toMap(
+                        x -> x,
+                        x -> tbHomeworkService.list(new QueryWrapper<TbHomework>()
+                                .eq("course_id", x))
+                ));
+        //2. 遍历courseIdToHomeworkMap Map<Integer, List<Homework>> 并对每个课程计算未完成的作业数量
+        // 创建新的Map来存储未完成的作业数量 Map<课程id, 该学生该课程未完成的作业数量>
+        Map<Integer, Integer> unfinishedHWMap = new HashMap<>();
+        courseIdToHomeworkMap.forEach((courseId, homeworks) -> {
+            int unfinishedCount = 0;
+            // 该课程的每个作业
+            for (TbHomework homework : homeworks) {
+                // 在tb_homework_read表中查询作业是否已完成 未完成则得到的count=1，否则为0
+                int count = (int)tbHomeworkReadService.count(new QueryWrapper<TbHomeworkRead>()
+                        .eq("homework_id", homework.getId())
+                        .eq("student_id", studentId)
+                        .eq("status", 2));
+                if (count > 0) {
+                    unfinishedCount += count;
+                }
+            }
+            unfinishedHWMap.put(courseId, unfinishedCount);
+        });
+
         // List<TbCourse> -> List<CourseInfo4StudentsVO>
-        List<CourseInfo4StudentsVO> courseInfo = courses.stream().map(
+        List<ChosenCourseInfo4StudentsVO> courseInfo = courses.stream().map(
                 x -> {
                     Integer courseId = x.getId();
-                    return CourseInfo4StudentsVO.builder()
+                    return ChosenCourseInfo4StudentsVO.builder()
                             .id(courseId)
                             .title(x.getTitle())
                             .description(x.getDescription())
                             .teacherId(x.getTeacherId())
                             .teacherName(teacherMap.get(x.getTeacherId()))
                             .enrollment(x.getEnrollment())
+                            .toFinish(unfinishedHWMap.get(courseId))
                             .build();
                 }
         ).toList();
 
-        BaseVO<List<CourseInfo4StudentsVO>> baseVO =
-                new BaseVO<List<CourseInfo4StudentsVO>>().success();
+        BaseVO<List<ChosenCourseInfo4StudentsVO>> baseVO =
+                new BaseVO<List<ChosenCourseInfo4StudentsVO>>().success();
         baseVO.setData(courseInfo);
         return baseVO;
     }
