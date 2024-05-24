@@ -43,6 +43,8 @@ public class HomeworkConsumerManager {
 
     private final Map<String, SimpleMessageListenerContainer> listenerContainers = new ConcurrentHashMap<>();
 
+//    private static Integer msgNum = 0;
+
     // 动态生成对应队列的Consumer（每个课程都有一个对应的queue和与其对应的consumer）
     public void addConsumer(String queueName) {
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
@@ -51,6 +53,7 @@ public class HomeworkConsumerManager {
         container.setMessageListener(new MessageListenerAdapter(new Object() {
             // 在收到对应队列中的消息时会执行handleMessage方法
             public void handleMessage(byte[] body) {
+//                msgNum++;
                 // 根据队列名称进行操作(只是为了说明可以获取到队列名称)
                 log.info("Received homework for " + queueName);
                 // 检查收到的内容
