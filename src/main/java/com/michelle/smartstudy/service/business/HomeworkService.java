@@ -1,6 +1,7 @@
 package com.michelle.smartstudy.service.business;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Maps;
@@ -12,10 +13,7 @@ import com.michelle.smartstudy.model.enums.CorrectingStatusEnum;
 import com.michelle.smartstudy.model.enums.ReadStatusEnum;
 import com.michelle.smartstudy.model.query.HWAssignQuery;
 import com.michelle.smartstudy.model.query.HWSubmitQuery;
-import com.michelle.smartstudy.model.vo.BaseVO;
-import com.michelle.smartstudy.model.vo.HWInfo4StudentsVO;
-import com.michelle.smartstudy.model.vo.HWInfo4TeachersVO;
-import com.michelle.smartstudy.model.vo.SubmittedHWInfo4TeachersVO;
+import com.michelle.smartstudy.model.vo.*;
 import com.michelle.smartstudy.mq.producer.HomeworkProducer;
 import com.michelle.smartstudy.mq.producer.SubmissionProducer;
 import com.michelle.smartstudy.service.base.*;
@@ -24,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -55,6 +54,9 @@ public class HomeworkService {
 
     @Autowired
     private ITbHomeworkReadService tbHomeworkReadService;
+
+    @Autowired
+    private ITbGradeService tbGradeService;
 
     // 教师布置作业
     public BaseVO<Object> assign(Integer id, HWAssignQuery hwAssignQuery) {
@@ -262,5 +264,26 @@ public class HomeworkService {
                 new BaseVO<List<HWInfo4StudentsVO>>().success();
         baseVO.setData(infos);
         return baseVO;
+    }
+
+    // 学生查看自己某个已完成作业的提交记录
+    public BaseVO<SubmissionInfo4StudentsVO> studentViewSubmit(Integer submitId) {
+        // 查询该提交记录对应的TbSubmission Entity
+        TbSubmission submission = tbSubmissionService.getById(submitId);
+        // 在tb_grade表中获取对应条目
+        QueryWrapper<TbGrade> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("submission_id", submitId);
+        TbGrade gradeInfo = tbGradeService.getOne(queryWrapper);
+
+        SubmissionInfo4StudentsVO info = SubmissionInfo4StudentsVO.builder()
+                .submitTime(submission.getSubmitTime())
+                .content(submission.getContent())
+                .status(submission.getStatus())
+                .statusDesc(CorrectingStatusEnum.getDescByCode(submission.getStatus()))
+                .score(gradeInfo != null ? gradeInfo.getScore() : BigDecimal.valueOf(0))
+                .comment(gradeInfo != null ? gradeInfo.getComment() : StrUtil.EMPTY)
+                .build();
+
+        return new BaseVO<SubmissionInfo4StudentsVO>().success().setData(info);
     }
 }

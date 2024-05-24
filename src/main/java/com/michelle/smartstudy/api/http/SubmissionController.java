@@ -1,6 +1,7 @@
 package com.michelle.smartstudy.api.http;
 
 import com.michelle.smartstudy.model.vo.BaseVO;
+import com.michelle.smartstudy.model.vo.SubmissionInfo4StudentsVO;
 import com.michelle.smartstudy.model.vo.SubmittedHWInfo4TeachersVO;
 import com.michelle.smartstudy.service.business.HomeworkService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,17 @@ public class SubmissionController {
             @PathVariable(value = "id") Integer id
     ) {
         return homeworkService.teacherGetSubmit(id);
+    }
+
+    /**
+     * 学生查看自己某个已完成作业的提交记录
+     * @param submitId 提交记录id
+     */
+    @GetMapping("/student/view/{submitId}")
+    public BaseVO<SubmissionInfo4StudentsVO> studentGetSubmit(
+            @PathVariable(value = "submitId") Integer submitId
+    ) {
+        return homeworkService.studentViewSubmit(submitId);
     }
 
 }
