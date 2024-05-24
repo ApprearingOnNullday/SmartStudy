@@ -3,6 +3,7 @@ package com.michelle.smartstudy.api.http;
 import com.michelle.smartstudy.model.query.HWAssignQuery;
 import com.michelle.smartstudy.model.query.HWSubmitQuery;
 import com.michelle.smartstudy.model.vo.BaseVO;
+import com.michelle.smartstudy.model.vo.HWInfo4StudentsVO;
 import com.michelle.smartstudy.model.vo.HWInfo4TeachersVO;
 import com.michelle.smartstudy.service.business.HomeworkService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +59,17 @@ public class HomeworkController {
             @PathVariable(value = "id") Integer id
     ) {
         return homeworkService.teacherGetAll(id);
+    }
+
+    /**
+     * 学生查看某门课的已布置作业
+     * @param id 课程id
+     */
+    @GetMapping("/student/displayAll/{id}")
+    public BaseVO<List<HWInfo4StudentsVO>> studentGetAll(
+            @PathVariable(value = "id") Integer id
+    ) {
+        return homeworkService.studentGetAll(id);
     }
 
 }
