@@ -1,6 +1,7 @@
 package com.michelle.smartstudy.api.http;
 
 import com.michelle.smartstudy.model.query.HWAssignQuery;
+import com.michelle.smartstudy.model.query.HWSubmitQuery;
 import com.michelle.smartstudy.model.vo.BaseVO;
 import com.michelle.smartstudy.service.business.HomeworkService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,17 @@ public class HomeworkController {
             @RequestBody HWAssignQuery hwAssignQuery
     ) {
         return homeworkService.assign(id, hwAssignQuery);
+    }
+
+    /**
+     * 学生提交作业
+     * @param hwSubmitQuery 提交的作业信息
+     */
+    @PostMapping("/submit")
+    public BaseVO<Object> hwSubmit(
+            @RequestBody HWSubmitQuery hwSubmitQuery
+    ) {
+        return homeworkService.submit(hwSubmitQuery);
     }
 
 }
