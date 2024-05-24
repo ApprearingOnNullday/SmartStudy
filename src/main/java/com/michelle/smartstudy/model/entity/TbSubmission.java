@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
  * @author AppearingOnNullday
  * @since 2024-05-20
  */
-@TableName("tb_homework")
+@TableName("tb_submission")
 @Data
 @Builder
 @NoArgsConstructor
