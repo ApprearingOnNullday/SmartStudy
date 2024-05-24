@@ -3,6 +3,7 @@ package com.michelle.smartstudy.api.http;
 import com.michelle.smartstudy.model.query.CourseAddQuery;
 import com.michelle.smartstudy.model.vo.BaseVO;
 import com.michelle.smartstudy.model.vo.CourseInfo4StudentsVO;
+import com.michelle.smartstudy.model.vo.CourseInfo4TeachersVO;
 import com.michelle.smartstudy.service.business.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -52,6 +53,14 @@ public class CourseController {
     @GetMapping("/student/display/all")
     public BaseVO<List<CourseInfo4StudentsVO>> getAllForStudent() {
         return courseService.getAllForStudent();
+    }
+
+    /**
+     * 教师查看系统中所有自己开设的课程
+     */
+    @GetMapping("/teacher/display/all")
+    public BaseVO<List<CourseInfo4TeachersVO>> getAllForTeacher() {
+        return courseService.getAllForTeacher();
     }
 
 }

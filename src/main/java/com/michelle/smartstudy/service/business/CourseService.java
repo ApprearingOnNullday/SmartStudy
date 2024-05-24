@@ -10,6 +10,7 @@ import com.michelle.smartstudy.model.query.CourseAddQuery;
 import com.michelle.smartstudy.model.vo.BaseVO;
 import com.michelle.smartstudy.model.vo.ChosenCourseInfo4StudentsVO;
 import com.michelle.smartstudy.model.vo.CourseInfo4StudentsVO;
+import com.michelle.smartstudy.model.vo.CourseInfo4TeachersVO;
 import com.michelle.smartstudy.mq.consumer.HomeworkConsumerManager;
 import com.michelle.smartstudy.mq.consumer.SubmissionConsumerManager;
 import com.michelle.smartstudy.service.base.*;
@@ -301,4 +302,31 @@ public class CourseService {
         return baseVO;
     }
 
+    // 教师查看系统中所有自己开设的课程
+    public BaseVO<List<CourseInfo4TeachersVO>> getAllForTeacher() {
+        // 获得教师用户 -> 获得teacherId
+        UserDTO user = UserHolder.get();
+        Integer teacherId = user.getId();
+        // 在tb_course表中查询该教师的所有课程
+        QueryWrapper<TbCourse> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("teacher_id", teacherId);
+        List<TbCourse> courses = tbCourseService.list(queryWrapper);
+        // convert to VO
+        List<CourseInfo4TeachersVO> res = courses.stream().map(
+                x -> {
+                    Integer courseId = x.getId();
+                    return CourseInfo4TeachersVO.builder()
+                            .id(courseId)
+                            .title(x.getTitle())
+                            .description(x.getDescription())
+                            .enrollment(x.getEnrollment())
+                            .build();
+                }
+        ).toList();
+
+        BaseVO<List<CourseInfo4TeachersVO>> baseVO =
+                new BaseVO<List<CourseInfo4TeachersVO>>().success();
+        baseVO.setData(res);
+        return baseVO;
+    }
 }
