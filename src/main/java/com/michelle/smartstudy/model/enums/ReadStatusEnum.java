@@ -2,9 +2,9 @@ package com.michelle.smartstudy.model.enums;
 
 public enum ReadStatusEnum {
 
-    FINISTHED(1, "已读"),
+    FINISTHED(1, "已完成"),
 
-    UNFINISHED(2, "未读");
+    UNFINISHED(2, "未完成");
 
     private Integer code;
 
