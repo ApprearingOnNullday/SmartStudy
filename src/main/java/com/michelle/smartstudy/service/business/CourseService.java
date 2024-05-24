@@ -11,6 +11,7 @@ import com.michelle.smartstudy.model.vo.BaseVO;
 import com.michelle.smartstudy.model.vo.ChosenCourseInfo4StudentsVO;
 import com.michelle.smartstudy.model.vo.CourseInfo4StudentsVO;
 import com.michelle.smartstudy.mq.consumer.HomeworkConsumerManager;
+import com.michelle.smartstudy.mq.consumer.SubmissionConsumerManager;
 import com.michelle.smartstudy.service.base.*;
 import com.michelle.smartstudy.utils.UserHolder;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,9 @@ public class CourseService {
 
     @Autowired
     private HomeworkConsumerManager hwConsumer;
+
+    @Autowired
+    private SubmissionConsumerManager submissionConsumer;
 
     @Autowired
     private ITbCourseService tbCourseService;
@@ -79,7 +83,7 @@ public class CourseService {
                     .build();
             tbCourseService.save(tbCourse);
 
-            // 创建队列
+            // 创建作业队列
             Queue queue = new Queue(courseName);
             rabbitAdmin.declareQueue(queue);
             // 绑定队列到交换机
@@ -90,6 +94,19 @@ public class CourseService {
 
             // 创建该队列的消费者，并让其监听队列
             hwConsumer.addConsumer(courseName);
+
+            // 创建作业提交队列
+            Queue queueSub = new Queue(courseName+"sub");
+            rabbitAdmin.declareQueue(queueSub);
+            // 绑定队列到交换机
+            Binding bindingSub = BindingBuilder.bind(queueSub).to(directExchange).with(courseName+"sub");
+            rabbitAdmin.declareBinding(bindingSub);
+
+            log.info("SubmissionQueue " + courseName + "sub added successfully!");
+
+            // 创建该队列的消费者，并让其监听队列
+            submissionConsumer.addConsumer(courseName+"sub");
+
             return baseVO.success();
         } else {    // 若不为教师角色
             return baseVO.failure().setData("不为教师角色，无法创建课程！");
@@ -112,6 +129,7 @@ public class CourseService {
             tbCourseService.removeById(courseId);
             // 删除该课程在rabbitMQ中对应的队列 & 删除监听该队列的消费者
             hwConsumer.removeConsumer(queueName);
+            submissionConsumer.removeConsumer(queueName+"sub");
             return baseVO.success();
         } else {    // 若不为教师角色
             return baseVO.failure().setData("不为教师角色，无法删除课程！");

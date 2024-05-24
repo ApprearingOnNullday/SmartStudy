@@ -2,6 +2,7 @@ package com.michelle.smartstudy;
 
 import com.michelle.smartstudy.model.entity.TbCourse;
 import com.michelle.smartstudy.mq.consumer.HomeworkConsumerManager;
+import com.michelle.smartstudy.mq.consumer.SubmissionConsumerManager;
 import com.michelle.smartstudy.service.base.ITbCourseService;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
@@ -31,6 +32,7 @@ public class SmartStudyApplication {
     public CommandLineRunner commandLineRunner(ApplicationContext context) {
         return args -> {
             HomeworkConsumerManager hwConsumer = context.getBean(HomeworkConsumerManager.class);
+            SubmissionConsumerManager submissionConsumer = context.getBean(SubmissionConsumerManager.class);
 
             // 从数据库中读取所有课程信息,并创建消费者
             List<TbCourse> courses = tbCourseService.list();
@@ -38,6 +40,7 @@ public class SmartStudyApplication {
                 log.info("课程名称：{}",course.getTitle());
                 String queueName = course.getTitle();
                 hwConsumer.addConsumer(queueName);
+                submissionConsumer.addConsumer(queueName+"sub");
             }
         };
     }
