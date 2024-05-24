@@ -7,10 +7,7 @@ import com.michelle.smartstudy.model.dto.UserDTO;
 import com.michelle.smartstudy.model.entity.*;
 import com.michelle.smartstudy.model.enums.RoleEnum;
 import com.michelle.smartstudy.model.query.CourseAddQuery;
-import com.michelle.smartstudy.model.vo.BaseVO;
-import com.michelle.smartstudy.model.vo.ChosenCourseInfo4StudentsVO;
-import com.michelle.smartstudy.model.vo.CourseInfo4StudentsVO;
-import com.michelle.smartstudy.model.vo.CourseInfo4TeachersVO;
+import com.michelle.smartstudy.model.vo.*;
 import com.michelle.smartstudy.mq.consumer.HomeworkConsumerManager;
 import com.michelle.smartstudy.mq.consumer.SubmissionConsumerManager;
 import com.michelle.smartstudy.service.base.*;
@@ -329,4 +326,40 @@ public class CourseService {
         baseVO.setData(res);
         return baseVO;
     }
+
+    // 教师获取某课程的学生列表
+    public BaseVO<List<StudentInfo4TeachersVO>> getStudentList(Integer courseId) {
+        // 在tb_student_course表中查询该教师的所有课程
+        QueryWrapper<TbStudentCourse> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("course_id", courseId);
+        List<TbStudentCourse> records = tbStudentCourseService.list(queryWrapper);
+        // 获得所有相关的学生id
+        List<Integer> studentIds = records.stream().map(
+                x -> {
+                    Integer studentId = x.getStudentId();
+                    return studentId;
+                }
+        ).toList();
+        // studentId -> studentName Map<Integer, String> <学生id, 学生姓名>
+        Map<Integer, String> userMap;
+        List<TbUser> tbUsers = tbUserService.listByIds(studentIds);
+        userMap = tbUsers.stream()
+                .collect(Collectors.toMap(TbUser::getId, TbUser::getUsername));
+        // convert to VO
+        List<StudentInfo4TeachersVO> infos = records.stream().map(
+                x -> {
+                    Integer studentId = x.getStudentId();
+                    return StudentInfo4TeachersVO.builder()
+                            .studentId(studentId)
+                            .studentName(userMap.get(studentId))
+                            .build();
+                }
+        ).toList();
+
+        BaseVO<List<StudentInfo4TeachersVO>> baseVO =
+                new BaseVO<List<StudentInfo4TeachersVO>>().success();
+        baseVO.setData(infos);
+        return baseVO;
+    }
+
 }
