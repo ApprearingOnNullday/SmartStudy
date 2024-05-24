@@ -7,22 +7,18 @@ import com.google.common.collect.Maps;
 import com.michelle.smartstudy.model.dto.HomeworkDTO;
 import com.michelle.smartstudy.model.dto.SubmissionDTO;
 import com.michelle.smartstudy.model.dto.UserDTO;
-import com.michelle.smartstudy.model.entity.TbCourse;
-import com.michelle.smartstudy.model.entity.TbHomework;
-import com.michelle.smartstudy.model.entity.TbSubmission;
-import com.michelle.smartstudy.model.entity.TbUser;
+import com.michelle.smartstudy.model.entity.*;
 import com.michelle.smartstudy.model.enums.CorrectingStatusEnum;
+import com.michelle.smartstudy.model.enums.ReadStatusEnum;
 import com.michelle.smartstudy.model.query.HWAssignQuery;
 import com.michelle.smartstudy.model.query.HWSubmitQuery;
 import com.michelle.smartstudy.model.vo.BaseVO;
+import com.michelle.smartstudy.model.vo.HWInfo4StudentsVO;
 import com.michelle.smartstudy.model.vo.HWInfo4TeachersVO;
 import com.michelle.smartstudy.model.vo.SubmittedHWInfo4TeachersVO;
 import com.michelle.smartstudy.mq.producer.HomeworkProducer;
 import com.michelle.smartstudy.mq.producer.SubmissionProducer;
-import com.michelle.smartstudy.service.base.ITbCourseService;
-import com.michelle.smartstudy.service.base.ITbHomeworkService;
-import com.michelle.smartstudy.service.base.ITbSubmissionService;
-import com.michelle.smartstudy.service.base.ITbUserService;
+import com.michelle.smartstudy.service.base.*;
 import com.michelle.smartstudy.utils.UserHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +52,9 @@ public class HomeworkService {
 
     @Autowired
     private ITbUserService tbUserService;
+
+    @Autowired
+    private ITbHomeworkReadService tbHomeworkReadService;
 
     // 教师布置作业
     public BaseVO<Object> assign(Integer id, HWAssignQuery hwAssignQuery) {
@@ -197,4 +196,71 @@ public class HomeworkService {
         return baseVO;
     }
 
+    // 学生查看某门课已布置的作业
+    public BaseVO<List<HWInfo4StudentsVO>> studentGetAll(Integer courseId) {
+        // 获得当前登录的学生用户
+        UserDTO user = UserHolder.get();
+        // 学生id
+        Integer studentId = user.getId();
+        // 查询tb_homework表中所有该课程的作业信息
+        LambdaQueryWrapper<TbHomework> query = new LambdaQueryWrapper<TbHomework>()
+                .eq(TbHomework::getCourseId, courseId);
+        // 创建时间倒序
+        query.orderByDesc(TbHomework::getCtime);
+        // 获取该课程所有Homework Entity的List
+        List<TbHomework> homeworks = tbHomeworkService.list(query);
+        // 相关的homeworkId的list
+        List<Integer> homeworkIds = homeworks.stream()
+                .map(TbHomework::getId)
+                .toList();
+        // 1. 根据作业id与学生id，到tb_homework_read表中查完成状态 Map<Integer, Integer> <作业id，该学生的完成状态>
+        // 2. 建立Map<作业id，提交记录id> （若作业未完成则对应的提交记录id=0）在submission表中没有对应记录说明未完成
+        Map<Integer, Integer> finishStatusMap = new HashMap<>();
+        Map<Integer, Integer> submitMap = new HashMap<>();
+        for(Integer homeworkId: homeworkIds) {
+            // 在tb_homework_read表中获取对应条目
+            QueryWrapper<TbHomeworkRead> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("homework_id", homeworkId)
+                    .eq("student_id", studentId);
+            TbHomeworkRead record = tbHomeworkReadService.getOne(queryWrapper);
+            // 获得完成状态
+            Integer status = record.getStatus();
+            // put到map中
+            finishStatusMap.put(homeworkId, status);
+
+            // 在tb_submission表中获取对应条目
+            QueryWrapper<TbSubmission> queryWrapper1 = new QueryWrapper<>();
+            queryWrapper1.eq("homework_id", homeworkId)
+                    .eq("student_id", studentId);
+            TbSubmission res = tbSubmissionService.getOne(queryWrapper1);
+            // 若res为空说明没有提交，将submission_id设置为0
+            if(res == null) {
+                submitMap.put(homeworkId, 0);
+            } else {
+                submitMap.put(homeworkId, res.getId());
+            }
+        }
+        // 构建VO （List<TbHomework> -> List<HWInfo4StudentsVO>）
+        List<HWInfo4StudentsVO> infos = homeworks.stream().map(
+                x -> {
+                    Integer homeworkId = x.getId(); // 作业id
+                    Integer finishStatus = finishStatusMap.get(homeworkId);
+                    return HWInfo4StudentsVO.builder()
+                            .homeworkId(homeworkId)
+                            .title(x.getTitle())
+                            .description(x.getDescription())
+                            .start(x.getStart())
+                            .end(x.getEnd())
+                            .status(finishStatus)
+                            .statusDesc(ReadStatusEnum.getDescByCode(finishStatus))
+                            .submitId(submitMap.get(homeworkId))
+                            .build();
+                }
+        ).toList();
+
+        BaseVO<List<HWInfo4StudentsVO>> baseVO =
+                new BaseVO<List<HWInfo4StudentsVO>>().success();
+        baseVO.setData(infos);
+        return baseVO;
+    }
 }
