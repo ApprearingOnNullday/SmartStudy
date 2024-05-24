@@ -2,6 +2,7 @@ package com.michelle.smartstudy.api.http;
 
 import com.michelle.smartstudy.model.vo.BaseVO;
 import com.michelle.smartstudy.model.vo.ChosenCourseInfo4StudentsVO;
+import com.michelle.smartstudy.model.vo.StudentInfo4TeachersVO;
 import com.michelle.smartstudy.service.business.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -41,6 +42,18 @@ public class StudentCourseController {
     @GetMapping("/display/chosen")
     public BaseVO<List<ChosenCourseInfo4StudentsVO>> getChosen() {
         return courseService.getChosen();
+    }
+
+    /**
+     * 教师获取某课程的学生列表
+     * @param courseId 课程id
+     * @return
+     */
+    @GetMapping("/studentList/{courseId}")
+    public BaseVO<List<StudentInfo4TeachersVO>> getStudentList(
+            @PathVariable(value = "courseId") Integer courseId
+    ) {
+        return courseService.getStudentList(courseId);
     }
 
 }

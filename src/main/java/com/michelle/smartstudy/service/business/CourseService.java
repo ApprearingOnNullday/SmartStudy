@@ -7,9 +7,7 @@ import com.michelle.smartstudy.model.dto.UserDTO;
 import com.michelle.smartstudy.model.entity.*;
 import com.michelle.smartstudy.model.enums.RoleEnum;
 import com.michelle.smartstudy.model.query.CourseAddQuery;
-import com.michelle.smartstudy.model.vo.BaseVO;
-import com.michelle.smartstudy.model.vo.ChosenCourseInfo4StudentsVO;
-import com.michelle.smartstudy.model.vo.CourseInfo4StudentsVO;
+import com.michelle.smartstudy.model.vo.*;
 import com.michelle.smartstudy.mq.consumer.HomeworkConsumerManager;
 import com.michelle.smartstudy.mq.consumer.SubmissionConsumerManager;
 import com.michelle.smartstudy.service.base.*;
@@ -298,6 +296,69 @@ public class CourseService {
         BaseVO<List<ChosenCourseInfo4StudentsVO>> baseVO =
                 new BaseVO<List<ChosenCourseInfo4StudentsVO>>().success();
         baseVO.setData(courseInfo);
+        return baseVO;
+    }
+
+    // 教师查看系统中所有自己开设的课程
+    public BaseVO<List<CourseInfo4TeachersVO>> getAllForTeacher() {
+        // 获得教师用户 -> 获得teacherId
+        UserDTO user = UserHolder.get();
+        Integer teacherId = user.getId();
+        // 在tb_course表中查询该教师的所有课程
+        QueryWrapper<TbCourse> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("teacher_id", teacherId);
+        List<TbCourse> courses = tbCourseService.list(queryWrapper);
+        // convert to VO
+        List<CourseInfo4TeachersVO> res = courses.stream().map(
+                x -> {
+                    Integer courseId = x.getId();
+                    return CourseInfo4TeachersVO.builder()
+                            .id(courseId)
+                            .title(x.getTitle())
+                            .description(x.getDescription())
+                            .enrollment(x.getEnrollment())
+                            .build();
+                }
+        ).toList();
+
+        BaseVO<List<CourseInfo4TeachersVO>> baseVO =
+                new BaseVO<List<CourseInfo4TeachersVO>>().success();
+        baseVO.setData(res);
+        return baseVO;
+    }
+
+    // 教师获取某课程的学生列表
+    public BaseVO<List<StudentInfo4TeachersVO>> getStudentList(Integer courseId) {
+        // 在tb_student_course表中查询该教师的所有课程
+        QueryWrapper<TbStudentCourse> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("course_id", courseId);
+        List<TbStudentCourse> records = tbStudentCourseService.list(queryWrapper);
+        // 获得所有相关的学生id
+        List<Integer> studentIds = records.stream().map(
+                x -> {
+                    Integer studentId = x.getStudentId();
+                    return studentId;
+                }
+        ).toList();
+        // studentId -> studentName Map<Integer, String> <学生id, 学生姓名>
+        Map<Integer, String> userMap;
+        List<TbUser> tbUsers = tbUserService.listByIds(studentIds);
+        userMap = tbUsers.stream()
+                .collect(Collectors.toMap(TbUser::getId, TbUser::getUsername));
+        // convert to VO
+        List<StudentInfo4TeachersVO> infos = records.stream().map(
+                x -> {
+                    Integer studentId = x.getStudentId();
+                    return StudentInfo4TeachersVO.builder()
+                            .studentId(studentId)
+                            .studentName(userMap.get(studentId))
+                            .build();
+                }
+        ).toList();
+
+        BaseVO<List<StudentInfo4TeachersVO>> baseVO =
+                new BaseVO<List<StudentInfo4TeachersVO>>().success();
+        baseVO.setData(infos);
         return baseVO;
     }
 
