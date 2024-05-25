@@ -3,12 +3,14 @@ package com.michelle.smartstudy.mq.consumer;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.michelle.smartstudy.model.dto.SubmissionDTO;
-import com.michelle.smartstudy.model.entity.TbHomeworkRead;
-import com.michelle.smartstudy.model.entity.TbSubmission;
+import com.michelle.smartstudy.model.entity.*;
 import com.michelle.smartstudy.model.enums.CorrectingStatusEnum;
 import com.michelle.smartstudy.model.enums.ReadStatusEnum;
+import com.michelle.smartstudy.service.base.ITbCourseService;
 import com.michelle.smartstudy.service.base.ITbHomeworkReadService;
 import com.michelle.smartstudy.service.base.ITbSubmissionService;
+import com.michelle.smartstudy.service.base.ITbUserService;
+import com.michelle.smartstudy.service.business.MailService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -36,11 +38,20 @@ public class SubmissionConsumerManager {
     @Autowired
     private ITbHomeworkReadService tbHomeworkReadService;
 
+    @Autowired
+    private ITbCourseService tbCourseService;
+
+    @Autowired
+    private ITbUserService tbUserService;
+
+    @Autowired
+    private MailService mailService;
+
     private final Map<String, SimpleMessageListenerContainer> listenerContainers = new ConcurrentHashMap<>();
 
     private static Integer msgNum = 0;
 
-    private static final Integer LIMIT = 3;     // 该队列累计收到多少作业后会给任课老师发邮件
+    private static final Integer LIMIT = 1;     // 该队列累计收到多少作业后会给任课老师发邮件
 
     // 动态生成对应队列的Consumer（每个课程都有一个对应的submissionqueue和与其对应的consumer）
     public void addConsumer(String queueName) {
@@ -56,6 +67,20 @@ public class SubmissionConsumerManager {
                 // 当收到足够多的submission时，可以给老师发邮件提醒批改作业（大概体现了MQ的异步）
                 if(msgNum.equals(LIMIT)) {
                     // todo：发邮件
+                    // 获得课程名(队列名称去掉末尾的“sub”)
+                    String courseName = queueName.substring(0, queueName.length() - 3);
+                    // 在tb_course表中获取对应条目
+                    QueryWrapper<TbCourse> queryWrapper = new QueryWrapper<>();
+                    queryWrapper.eq("title", courseName);
+                    TbCourse course = tbCourseService.getOne(queryWrapper);
+                    // 得到对应的教师id
+                    Integer teacherId = course.getTeacherId();
+                    // 到tb_user表中找到教师邮箱
+                    TbUser user = tbUserService.getById(teacherId);
+                    String email = user.getEmail();
+                    // 使用mail service发送邮件提醒教师批改作业
+                    mailService.sendMail(courseName, LIMIT, email);
+
                     msgNum = 0;     // 重置
                 }
                 // 检查收到的内容
