@@ -18,6 +18,12 @@ spring:
     virtual-host: vhost01 #虚拟主机
     courseExcName: courseTopicExchange #课程Topic-直连交换机（direct）
 
+  mail:
+    host: smtp.126.com
+    username: studyserver1052@126.com
+    password: AFJSTAOXWYIIEHVA # 授权码 QGSHTKHEWNTQVBFA
+    from: studyserver1052@126.com # 发送者
+
 jwt:
   secret-key-str: VGhpcyBpcyBTQSBHcm91cCAxMi5IYXZlIHRvIGJ1aWxkIGEga2V5IGxvbmcgZW5vdWdoIGZvciB0aGUgYWxnb3JpdGhtIHRvIHJ1bg==
   # token 有效期 单位：天
