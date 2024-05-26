@@ -153,11 +153,12 @@ public class HomeworkService {
         return baseVO;
     }
 
-    // 教师查看自己某门课程布置的某个作业的所有提交记录
-    public BaseVO<List<SubmittedHWInfo4TeachersVO>> teacherGetSubmit(Integer homeworkId) {
+    // 教师查看自己某门课程布置的某个作业的所有提交记录(按已提交状态&未提交状态)
+    public BaseVO<List<SubmittedHWInfo4TeachersVO>> teacherGetSubmit(Integer homeworkId, Integer status) {
         // 根据作业id在提交表tb_submission中查询所有条目，并按submit_time的正序排序
         LambdaQueryWrapper<TbSubmission> query = new LambdaQueryWrapper<>();
         query.eq(TbSubmission::getHomeworkId, homeworkId)
+                .eq(TbSubmission::getStatus, status)
                 .orderByAsc(TbSubmission::getSubmitTime);   // 先显示提交的早的
         List<TbSubmission> submissions = tbSubmissionService.list(query);
         // studentId -> studentName Map<学生id, 学生姓名>
@@ -175,11 +176,28 @@ public class HomeworkService {
             studentMap = students.stream()
                     .collect(Collectors.toMap(TbUser::getId, TbUser::getUsername));
         }
+        // 得到所有相关的submissionId
+        List<Integer> submissionIds = submissions.stream()
+                .map(TbSubmission::getId)
+                .toList();
+        Map<Integer, TbGrade> gradeMap = new HashMap<>();
+        if (CollectionUtil.isEmpty(submissionIds)) {
+            log.error("empty submission ids");
+        } else {
+            // submissionId -> TbGrade Entity
+            for(Integer submitId: submissionIds) {
+                QueryWrapper<TbGrade> queryWrapper = new QueryWrapper<>();
+                queryWrapper.eq("submission_id", submitId);
+                TbGrade tbGrade = tbGradeService.getOne(queryWrapper);
+                gradeMap.put(submitId, tbGrade);
+            }
+        }
         // 转换为VO（List<TbSubmission> -> List<SubmittedHWInfo4TeachersVO>）
         List<SubmittedHWInfo4TeachersVO> infos = submissions.stream().map(
                 x -> {
                     Integer studentId = x.getStudentId();   // 学生id
-                    Integer status = x.getStatus(); // 批改状态
+                    Integer submissionId = x.getId();   // 提交id
+                    TbGrade tbGrade = gradeMap.get(submissionId); // submissionId对应的TbGrade Entity
                     return SubmittedHWInfo4TeachersVO.builder()
                             .submitId(x.getId())
                             .studentId(studentId)
@@ -188,6 +206,8 @@ public class HomeworkService {
                             .content(x.getContent())
                             .status(status)
                             .statusDesc(CorrectingStatusEnum.getDescByCode(status))
+                            .score(tbGrade != null ? tbGrade.getScore() : BigDecimal.valueOf(0))
+                            .comment(tbGrade != null ? tbGrade.getComment() : StrUtil.EMPTY)
                             .build();
                 }
         ).toList();
