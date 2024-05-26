@@ -286,4 +286,10 @@ public class HomeworkService {
 
         return new BaseVO<SubmissionInfo4StudentsVO>().success().setData(info);
     }
+
+    // 查看某项作业的详情信息
+    public BaseVO<Object> getDetail(Integer homeworkId) {
+        TbHomework tbHomework = tbHomeworkService.getById(homeworkId);
+        return new BaseVO<>().success().setData(tbHomework);
+    }
 }
