@@ -1,5 +1,6 @@
 package com.michelle.smartstudy.api.http;
 
+import com.michelle.smartstudy.model.entity.TbHomework;
 import com.michelle.smartstudy.model.query.HWAssignQuery;
 import com.michelle.smartstudy.model.query.HWSubmitQuery;
 import com.michelle.smartstudy.model.vo.BaseVO;
@@ -70,6 +71,17 @@ public class HomeworkController {
             @PathVariable(value = "id") Integer id
     ) {
         return homeworkService.studentGetAll(id);
+    }
+
+    /**
+     * 查看某个作业的详情信息
+     * @param id 作业id
+     */
+    @GetMapping("/getDetail/{id}")
+    public BaseVO<Object> getDetail(
+            @PathVariable(value = "id") Integer id
+    ) {
+        return homeworkService.getDetail(id);
     }
 
 }
