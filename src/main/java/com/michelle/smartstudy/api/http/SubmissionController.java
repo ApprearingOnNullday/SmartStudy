@@ -5,10 +5,7 @@ import com.michelle.smartstudy.model.vo.SubmissionInfo4StudentsVO;
 import com.michelle.smartstudy.model.vo.SubmittedHWInfo4TeachersVO;
 import com.michelle.smartstudy.service.business.HomeworkService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,12 +27,14 @@ public class SubmissionController {
     /**
      * 教师查看自己某门课某次作业的所有已提交记录
      * @param id 作业id
+     * @param status 批改状态
      */
     @GetMapping("/teacher/getAll/{id}")
     public BaseVO<List<SubmittedHWInfo4TeachersVO>> teacherGetSubmit(
-            @PathVariable(value = "id") Integer id
+            @PathVariable(value = "id") Integer id,
+            @RequestParam(value = "status") Integer status
     ) {
-        return homeworkService.teacherGetSubmit(id);
+        return homeworkService.teacherGetSubmit(id, status);
     }
 
     /**

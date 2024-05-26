@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -47,5 +48,15 @@ public class SubmittedHWInfo4TeachersVO {
      * 批改状态描述（已批改/未批改）
      */
     private String statusDesc;
+
+    /**
+     * 分数（若已批改则有）
+     */
+    private BigDecimal score;
+
+    /**
+     * 评语（若已批改则有）
+     */
+    private String comment;
 
 }
