@@ -4,6 +4,7 @@ import com.michelle.smartstudy.model.vo.BaseVO;
 import com.michelle.smartstudy.model.vo.SubmissionInfo4StudentsVO;
 import com.michelle.smartstudy.model.vo.SubmittedHWInfo4TeachersVO;
 import com.michelle.smartstudy.service.business.HomeworkService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +20,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/submission")
+@Slf4j
 public class SubmissionController {
 
     @Autowired
@@ -34,6 +36,7 @@ public class SubmissionController {
             @PathVariable(value = "id") Integer id,
             @RequestParam(value = "status") Integer status
     ) {
+        log.info("作业id={}，status={}", id, status);
         return homeworkService.teacherGetSubmit(id, status);
     }
 

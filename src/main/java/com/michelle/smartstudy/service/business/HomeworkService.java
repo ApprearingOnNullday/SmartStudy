@@ -61,7 +61,10 @@ public class HomeworkService {
     // 教师布置作业
     public BaseVO<Object> assign(Integer id, HWAssignQuery hwAssignQuery) {
         // 将前端传的时间数据 由String -> LocalDateTime
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+//        LocalDateTime start = LocalDateTime.parse(hwAssignQuery.getStart(), formatter);
+//        LocalDateTime end = LocalDateTime.parse(hwAssignQuery.getEnd(), formatter);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
         LocalDateTime start = LocalDateTime.parse(hwAssignQuery.getStart(), formatter);
         LocalDateTime end = LocalDateTime.parse(hwAssignQuery.getEnd(), formatter);
         // 根据课程id获得课程名（即队列名）
