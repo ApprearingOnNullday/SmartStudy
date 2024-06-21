@@ -107,6 +107,7 @@ public class CourseService {
 
             return baseVO.success();
         } else {    // 若不为教师角色
+            log.error("角色错误！");
             return baseVO.failure().setData("不为教师角色，无法创建课程！");
         }
     }

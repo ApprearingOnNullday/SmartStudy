@@ -31,17 +31,22 @@ public class SmartStudyApplication {
     @Bean
     public CommandLineRunner commandLineRunner(ApplicationContext context) {
         return args -> {
-            HomeworkConsumerManager hwConsumer = context.getBean(HomeworkConsumerManager.class);
-            SubmissionConsumerManager submissionConsumer = context.getBean(SubmissionConsumerManager.class);
+            try{
+                HomeworkConsumerManager hwConsumer = context.getBean(HomeworkConsumerManager.class);
+                SubmissionConsumerManager submissionConsumer = context.getBean(SubmissionConsumerManager.class);
 
-            // 从数据库中读取所有课程信息,并创建消费者
-            List<TbCourse> courses = tbCourseService.list();
-            for (TbCourse course : courses) {
-                log.info("课程名称：{}",course.getTitle());
-                String queueName = course.getTitle();
-                hwConsumer.addConsumer(queueName);
-                submissionConsumer.addConsumer(queueName+"sub");
+                // 从数据库中读取所有课程信息,并创建消费者
+                List<TbCourse> courses = tbCourseService.list();
+                for (TbCourse course : courses) {
+                    log.info("课程名称：{}",course.getTitle());
+                    String queueName = course.getTitle();
+                    hwConsumer.addConsumer(queueName);
+                    submissionConsumer.addConsumer(queueName+"sub");
+                }
+            } catch (Exception e) {
+                log.error(e.getMessage());
             }
+
         };
     }
 

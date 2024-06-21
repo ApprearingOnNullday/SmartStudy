@@ -78,8 +78,13 @@ public class SubmissionConsumerManager {
                     // 到tb_user表中找到教师邮箱
                     TbUser user = tbUserService.getById(teacherId);
                     String email = user.getEmail();
-                    // 使用mail service发送邮件提醒教师批改作业
-                    mailService.sendMail(courseName, LIMIT, email);
+
+                    try {
+                        // 使用mail service发送邮件提醒教师批改作业
+                        mailService.sendMail(courseName, LIMIT, email);
+                    } catch (Exception e) {
+                        log.warn(e.getMessage());
+                    }
 
                     msgNum = 0;     // 重置
                 }

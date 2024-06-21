@@ -108,6 +108,26 @@ public class HomeworkService {
         // 向该课程对应的消息队列中发送一条作业message
         submissionProducer.sendMsg(queueName, submissionDTO);
         log.info("send msg : {}  To queue: {}", submissionDTO, courseName+"sub");
+
+        /*
+        // 从SubmissionDTO中获取提交对应的作业id
+        Integer homeworkId = submissionDTO.getHomeworkId();   // 作业id
+        // 创建TbSubmission，并插入DB中
+        TbSubmission submission = TbSubmission.builder()
+                .studentId(submissionDTO.getStudentId())
+                .homeworkId(homeworkId)
+                .submitTime(submissionDTO.getSubmitTime())
+                .content(submissionDTO.getContent())
+                .status(CorrectingStatusEnum.UNCORRECTED.getCode())
+                .build();
+        // 存入tb_submission表中
+        tbSubmissionService.save(submission);
+        // 将tb_homework_read对应的表项状态update为1--已完成
+        TbHomeworkRead record = tbHomeworkReadService.getOne(new QueryWrapper<TbHomeworkRead>()
+                .eq("student_id", submissionDTO.getStudentId())
+                .eq("homework_id", submissionDTO.getHomeworkId()));
+        */
+
         return new BaseVO<>().success().setData("已成功提交作业！");
     }
 
